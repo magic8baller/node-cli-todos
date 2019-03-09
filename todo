@@ -1,8 +1,7 @@
 #!/usr/bin/env node
+
 const chalk = require('chalk')
 const args = process.argv
-
-const commands = ['new', 'list', 'done', 'help']
 
 const menu = function() {
   const menuText = `
@@ -31,9 +30,20 @@ if (args.length > 3) {
   menu()
 }
 
-if (commands.indexOf(args[2]) == -1) {
-  errorLog('invalid command entered')
-  menu()
+switch(args[2]) {
+  case 'help':
+    menu()
+    break
+  case 'new':
+    break
+  case 'list':
+    break
+  case 'done':
+    break
+  default:
+    errorLog('invalid command entered')
+    menu()
+
 }
 
 
