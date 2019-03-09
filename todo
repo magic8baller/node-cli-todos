@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+const chalk = require('chalk')
+const args = process.argv
+
+const commands = ['new', 'list', 'done', 'help']
+
+const menu = function() {
+  const menuText = `
+  todo helps you manage your todos!
+
+  usage:
+    todo <command>
+
+    legit commands:
+
+    new:        to create a new todo
+    list:       to retrieve your todos
+    done:       to mark a todo as complete
+    help:       print the help menu
+  `
+  console.log(menuText)
+}
+
+function errorLog(error) {
+  const errLog = chalk.red(error)
+  console.log(errLog)
+}
+
+if (args.length > 3) {
+  errorLog(`only 1 argument can be accepted`)
+  menu()
+}
+
+if (commands.indexOf(args[2]) == -1) {
+  errorLog('invalid command entered')
+  menu()
+}
+
+
+console.log(process.argv)
