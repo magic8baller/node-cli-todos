@@ -1,6 +1,71 @@
 #!/usr/bin/env node
 
 const chalk = require('chalk')
+const rl = require('readline')
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
+const adapter = new FileSync('db.json')
+const db = low(adapter)
+
+db.defaults({ todos: []}).write()
+
+function prompt(question) {
+  const r = rl.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    terminal: false
+  })
+  return new Promise((resolve, error) => {
+    r.question(question, answer => {
+      r.close()
+      resolve(answer)
+    })
+  })
+}
+
+function newTodo() {
+  const q = chalk.blue('Enter your todo\n')
+  prompt(q).then(todo => {
+    db.get('todos')
+      .push({
+        title: todo,
+        complete: false
+      })
+      .write()
+  })
+}
+
+function listTodos() {
+  const todos = db.get('todos').value()
+  let idx = 1
+  todos.forEach(todo => {
+    const todoText = chalk.yellow(`${idx++}. ${todo.title}`)
+    console.log(todoText)
+  })
+}
+
+function completeTodo() {
+  if (args.length != 4) {
+    errorLog('invalid number of commands entered')
+    return
+  }
+
+  let todoNumber = Number(args[3])
+  if (isNaN(todoNumber)) {
+    errorLog('please enter a valid number')
+    return
+  }
+
+  let todosLength = db.get('todos').value().length
+  if (todoNumber > todosLength) {
+    errorLog('invalid number passed for complete command')
+    return
+  }
+  const todoIdx = todoNumber - 1;
+  db.set(`todos[${todoIdx}].complete`, true)
+    .write()
+}
+
 const args = process.argv
 
 const menu = function() {
@@ -25,7 +90,7 @@ function errorLog(error) {
   console.log(errLog)
 }
 
-if (args.length > 3) {
+if (args.length > 3 && args[2] != 'done') {
   errorLog(`only 1 argument can be accepted`)
   menu()
 }
@@ -35,10 +100,13 @@ switch(args[2]) {
     menu()
     break
   case 'new':
+  newTodo()
     break
   case 'list':
+    listTodos()
     break
   case 'done':
+    completeTodo()
     break
   default:
     errorLog('invalid command entered')
